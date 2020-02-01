@@ -14,9 +14,10 @@
 
 		<youtube ref="youtube" id="ytb" :video-id="videoId" @ready="ready" @playing="playing" @paused="paused"></youtube>
 		
-		<ul>Video Watcher: 
-			<li ref="playing"> Astept sa primesc date</li>
+		<ul>Playing/ Paused: 
+			<li ref="playingPaused"> Listening...</li>
 		</ul>
+
 
 	</div>
 	</template>
@@ -31,13 +32,12 @@
 				return {
 							socket: {},
 							context: 0,
-							position :{
-									x: 0,
-									y: 0
-						},
-						videoId: '6twHWEstx2Q'
-						}
-		},
+							position :{x: 0, y: 0},
+							videoId: '6twHWEstx2Q',
+							events: [],
+							
+				} //fara virgula dupa return
+			},		
 		// Ready to establish a socket connection, best way is created(), before the View renders
 		created(){
 				// For Gitpod, beware as it is not localhost, instead paste the link they gave eg: https://3000-ec7c0a46-d8e8-4fb7-b436-551bbd8a6fdc.ws-eu01.gitpod.io/
@@ -47,6 +47,7 @@
 		mounted(){
 			//Getting data back from server this.socket.on
 				this.context = this.$refs.game.getContext("2d");
+
 				this.socket.on("position", data => {
 						this.position = data;
 						this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height); // Clear the canvas
@@ -59,13 +60,17 @@
 				})
 				this.socket.on('playing', data => {  
 						// eslint-disable-next-line no-console
-						console.log(data);
-						this.$refs.playing.textContent = data ; //write what we get in DOM
+						this.events.push(data);
+						this.$refs.playingPaused.textContent = data ; //write what we get in DOM
+		
+					
+						console.log(this.events);
 				})
 				this.socket.on('paused', data => {  
 						// eslint-disable-next-line no-console
-						console.log(data);
-						this.$refs.playing.textContent = data ; //write what we get in DOM
+						this.events.push(data);
+						this.$refs.playingPaused.textContent = data ; //write what we get in DOM
+						console.log(this.events);
 				})
 
 		},
@@ -83,10 +88,8 @@
 			// The player is playing a video.
 				console.log('\o/ we are watching!!!')
 				this.socket.emit("playing");//1. Emit from client to server, from server back, and client show again
-								
 			},
 			paused () {
-		
 				console.log('Video paused')
 				this.socket.emit("paused");
 				//this.socket.emit("playing", event);//1. Emit from client to server, from server back, and client show again
