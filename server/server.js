@@ -10,6 +10,8 @@ var position = {
 // end of it
 
 Socketio.on("connection", socket => {
+    console.log('+ ' + socket.handshake.time + ':' + socket.id + ' connected.' )
+
     socket.emit("position", position) // As in pos line5
     socket.on('move', data => {
         switch(data){
@@ -38,6 +40,10 @@ Socketio.on("connection", socket => {
                 break;
         }
     })
+    socket.on("disconnect", data => {
+     console.log('- ' + socket.handshake.time +  socket.id + ' disconnected.')
+    })
+
 });
 
 // end of it
