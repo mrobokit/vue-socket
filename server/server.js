@@ -34,7 +34,7 @@ Socketio.on("connection", socket => {
         })  // send to all clients
     })
     socket.on("paused", data => {
-        console.log( socket.handshake.issued + ' '+ socket.id + ' paused video.') // log here
+        console.log( socket.id + ' paused video.') // log here
 
         Socketio.emit('paused', {
             idAction: socket.id + " paused the video.",

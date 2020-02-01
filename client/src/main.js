@@ -5,7 +5,6 @@ import VueChatScroll from 'vue-chat-scroll'
 
 Vue.use(VueChatScroll)
 Vue.use(VueYoutube)
-Vue.use(require('vue-moment'));
 
 Vue.config.productionTip = false
 

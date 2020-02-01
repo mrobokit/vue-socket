@@ -19,11 +19,11 @@
 				<li 
 						v-for="event in events" :key="event.id" 
 						ref="playingPaused"
+						
 				> 
 					<span>{{event.idAction}} </span>
-					<span class="timestamp">{{ event.timestamp | moment("from") }}</span> 
+					<span ref="timestamp" class="timestamp">{{event.timestamp | fromNow }}</span>  <!--3 time magic + 4. script in html = done!-->
 				</li>
-				<!-- //<span>{{ someDate | moment("from") }}</span> -->
 			</ul>
 	
 
@@ -36,33 +36,39 @@
 	<script>
 	/* eslint-disable */
 	import io from 'socket.io-client'; 
+	//import moment from 'moment'
 	
 	//will import vue moment
 	export default {
-			name: 'BlockGame',
-			data(){
-				return {
-							socket: {},
-							context: 0,
-							position :{x: 0, y: 0},
-							videoId: '6twHWEstx2Q',
-							events: [],
-							
-				} //fara virgula dupa return
-			},		
+		name: 'BlockGame',
+		data(){
+			return {
+						socket: {},
+						context: 0,
+						position :{x: 0, y: 0},
+						videoId: '6twHWEstx2Q',
+						events: [],
+						interval: null //1. time magic
+
+			} //fara virgula dupa return
+		},
+		filters: {
+				fromNow(date) {
+					return moment(date).fromNow();
+				}
+		},	
 		// Ready to establish a socket connection, best way is created(), before the View renders
 		created(){
-			//Time update
-			updateTime:setInterval
+
+				this.interval = setInterval(() => this.$forceUpdate(), 1000); //2. time magic
+			
 				// For Gitpod, beware as it is not localhost, instead paste the link they gave eg: https://3000-ec7c0a46-d8e8-4fb7-b436-551bbd8a6fdc.ws-eu01.gitpod.io/
 				this.socket = io("http://localhost:3000"); // Client socket to > server adress
 		},
 		// After the view renders, we want to start listening for events, best way is mounted(), so we can work with our canvas
 		mounted(){
-			
-			//Getting data back from server this.socket.on
-				this.context = this.$refs.game.getContext("2d");
 				
+				this.context = this.$refs.game.getContext("2d");
 
 				this.socket.on("position", data => {
 						this.position = data;
@@ -76,17 +82,25 @@
 				})
 				this.socket.on('playing', data => {  
 						// eslint-disable-next-line no-console
+			
 						this.events.push(data);
+	
 						//console.log(this.events);
+						
 				})
 				this.socket.on('paused', data => {  
 						// eslint-disable-next-line no-console
+					
 						this.events.push(data); //write to array, which will output to dom with v-for
 						//console.log(this.events);
+
 				})
 
 		},
+		beforeUpdated() {
+	
 
+		},
 		methods: {
 			// "Move in this direction and let the server determine how far it moved"
 			move(direction){ 
@@ -106,7 +120,11 @@
 				this.socket.emit("paused");
 				//this.socket.emit("playing", event);//1. Emit from client to server, from server back, and client show again
 			},
-		},
+
+		}, //methods
+			beforeDestroy() {
+				clearInterval(this.interval);
+			},
 	}
 	</script>
 
