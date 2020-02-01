@@ -14,9 +14,16 @@
 
 		<youtube ref="youtube" id="ytb" :video-id="videoId" @ready="ready" @playing="playing" @paused="paused"></youtube>
 		
-		<ul>Playing/ Paused: 
-			<li ref="playingPaused"> Listening...</li>
-		</ul>
+		
+			<ul class="list-container" v-chat-scroll > 
+				<li 
+						v-for="event in events" :key="event.id" 
+						ref="playingPaused"> {{event}}
+				</li>
+			</ul>
+	
+
+
 
 
 	</div>
@@ -25,7 +32,8 @@
 	<script>
 	/* eslint-disable */
 	import io from 'socket.io-client'; 
-		
+	
+	//will import vue moment
 	export default {
 			name: 'BlockGame',
 			data(){
@@ -62,8 +70,6 @@
 						// eslint-disable-next-line no-console
 						this.events.push(data);
 						this.$refs.playingPaused.textContent = data ; //write what we get in DOM
-		
-					
 						console.log(this.events);
 				})
 				this.socket.on('paused', data => {  
@@ -104,5 +110,15 @@
 		position: absolute;
 		top:0%;
 		right:0;
+	}
+
+	ul.list-container  {
+  list-style-type: none;
+	font-size: 14px;
+		height: 150px;
+		width:400px;
+		overflow-y: auto;
+		background: lightseagreen;
+		color: rgb(61, 24, 24);
 	}
 	</style>
