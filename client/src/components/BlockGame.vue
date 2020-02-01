@@ -18,8 +18,12 @@
 			<ul class="list-container" v-chat-scroll > 
 				<li 
 						v-for="event in events" :key="event.id" 
-						ref="playingPaused"> {{event}}
+						ref="playingPaused"
+				> 
+					<span>{{event.idAction}} </span>
+					<span class="timestamp">{{ event.timestamp | moment("from") }}</span> 
 				</li>
+				<!-- //<span>{{ someDate | moment("from") }}</span> -->
 			</ul>
 	
 
@@ -48,13 +52,17 @@
 			},		
 		// Ready to establish a socket connection, best way is created(), before the View renders
 		created(){
+			//Time update
+			updateTime:setInterval
 				// For Gitpod, beware as it is not localhost, instead paste the link they gave eg: https://3000-ec7c0a46-d8e8-4fb7-b436-551bbd8a6fdc.ws-eu01.gitpod.io/
 				this.socket = io("http://localhost:3000"); // Client socket to > server adress
 		},
 		// After the view renders, we want to start listening for events, best way is mounted(), so we can work with our canvas
 		mounted(){
+			
 			//Getting data back from server this.socket.on
 				this.context = this.$refs.game.getContext("2d");
+				
 
 				this.socket.on("position", data => {
 						this.position = data;
@@ -64,19 +72,17 @@
 				this.socket.on('Created', data => {  
 						// eslint-disable-next-line no-console
 						console.log(data);
-						this.$refs.connected.textContent = data ; //write what we get in DOM
+
 				})
 				this.socket.on('playing', data => {  
 						// eslint-disable-next-line no-console
 						this.events.push(data);
-						this.$refs.playingPaused.textContent = data ; //write what we get in DOM
-						console.log(this.events);
+						//console.log(this.events);
 				})
 				this.socket.on('paused', data => {  
 						// eslint-disable-next-line no-console
-						this.events.push(data);
-						this.$refs.playingPaused.textContent = data ; //write what we get in DOM
-						console.log(this.events);
+						this.events.push(data); //write to array, which will output to dom with v-for
+						//console.log(this.events);
 				})
 
 		},
@@ -120,5 +126,9 @@
 		overflow-y: auto;
 		background: lightseagreen;
 		color: rgb(61, 24, 24);
+	}
+	.timestamp{
+		opacity: 0.7;
+		font-size:12px;
 	}
 	</style>

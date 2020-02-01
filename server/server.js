@@ -28,11 +28,18 @@ Socketio.on("connection", socket => {
     socket.on("playing", data => {
         console.log(socket.id + ' playing video.') // log here socket.handshake.time 
         //.slice to make it shorter in client
-        Socketio.emit('playing',  '+' + socket.id.slice(0, 8) + " started playing video.") // send to all clients
+        Socketio.emit('playing', {
+            idAction: socket.id + " played the video.",
+            timestamp: socket.handshake.time 
+        })  // send to all clients
     })
     socket.on("paused", data => {
-        console.log('- ' + socket.id + ' paused video.') // log here
-        Socketio.emit('paused',  '-' + socket.id.slice(0, 8) + " paused the video." ) // send to all clients
+        console.log( socket.handshake.issued + ' '+ socket.id + ' paused video.') // log here
+
+        Socketio.emit('paused', {
+            idAction: socket.id + " paused the video.",
+            timestamp: socket.handshake.time 
+        })  // send to all clients
     })
     socket.on('move', data => {
         switch (data) {
