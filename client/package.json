@@ -10,7 +10,8 @@
   "dependencies": {
     "core-js": "^3.4.4",
     "socket.io": "^2.3.0",
-    "vue": "^2.6.10"
+    "vue": "^2.6.10",
+    "vue-youtube": "^1.4.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^4.1.0",
@@ -20,7 +21,7 @@
     "eslint": "^5.16.0",
     "eslint-plugin-vue": "^5.0.0",
     "vue-template-compiler": "^2.6.10"
-  }, 
+  },
   "eslintConfig": {
     "root": true,
     "env": {
