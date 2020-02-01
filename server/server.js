@@ -11,6 +11,8 @@ var position = {
 
 Socketio.on("connection", socket => {
     console.log('+ ' + socket.handshake.time + ':' + socket.id + ' connected.' )
+    //socket.emit('Created', socket.id + "connected" ) // EMIT TO CURRENT  Client, cand s-a creat(prima), messajul - si apoi ala doar console.log(data)
+    Socketio.emit('Created', socket.id + "connected" ) // emits to all clients
 
     socket.emit("position", position) // As in pos line5
     socket.on('move', data => {
@@ -43,6 +45,7 @@ Socketio.on("connection", socket => {
     socket.on("disconnect", data => {
      console.log('- ' + socket.handshake.time +  socket.id + ' disconnected.')
     })
+
 
 });
 

@@ -7,6 +7,11 @@
     <button @click="move('left')">Left</button>
     <button @click="move('up')">Up</button>
     <button @click="move('down')">Down</button>
+
+    <ul>Last connected: 
+        <li ref="connected"> </li>
+    </ul>
+   
   </div>
 </template>
 
@@ -38,6 +43,12 @@
                 this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height); // Clear the canvas
                 this.context.fillRect(this.position.x, this.position.y, 20, 20); // Add a rectangle
             })
+            this.socket.on('Created', data => {  
+                // eslint-disable-next-line no-console
+                console.log(data);
+                this.$refs.connected.textContent = data ; //write what we get in DOM
+            })
+
         },
         methods: {
             // "Move in this direction and let the server determine how far it moved"
