@@ -35,7 +35,7 @@
             this.context = this.$refs.game.getContext("2d");
             this.socket.on("position", data => {
                 this.position = data;
-                //this.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height); // Clear the canvas
+                this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height); // Clear the canvas
                 this.context.fillRect(this.position.x, this.position.y, 20, 20); // Add a rectangle
             })
         },
