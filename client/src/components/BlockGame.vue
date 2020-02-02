@@ -12,6 +12,7 @@
 		<div id="youtubeTerminal">
 			<div id="bar"> 
 				<span id="whatfor">Youtube Logs</span>
+				
 				<div id="red"></div>
 				<div id="yellow"></div>
 				<div id="green"></div>
@@ -22,7 +23,7 @@
 						ref="playingPaused"
 						
 				> 
-					<span class="id">{{event.id.substring(0, 8)}} </span>  <!-- .substring(0, 8)-->
+					<span class="id">{{event.id}} </span>  <!-- .substring(0, 8)-->
 					<span :class="{'play': event.action === 'started watching.', 
 												'pause': event.action === 'paused.', 
 												'': event.action == 'joined room.', 
@@ -39,16 +40,21 @@
 				</li>
 			</ul>
 		</div>
+				
+			<div class="ytb-but"> 
+					<button @click="playVideo">Play</button>
+					<button @click="pauseVideo">Pause</button>
+			</div>
+
 
 		<youtube ref="youtube" id="ytb" :video-id="videoId" 
 						@ready="ready" 
 						@playing="playing" 
 						@paused="paused"
 						@ended="ended"
-						@buffering="buffering"
-						@qued="qued"></youtube>
-		<button @click="playVideo">play</button>
-		
+						></youtube>
+
+	
 
 
 		<div id="bar"> 
@@ -84,65 +90,72 @@
 						position :{x: 0, y: 0},
 						videoId: 'BBJa32lCaaY',
 						events: [],
+						username: "",
 
-			} //fara virgula dupa return
+			}
 		},
-		// Ready to establish a socket connection, best way is created(), before the View renders
 		created(){
-
-				//this.interval = setInterval(() => this.$forceUpdate(), 1000); //2. time magic
-				// For Gitpod, beware as it is not localhost, instead paste the link they gave eg: https://3000-ec7c0a46-d8e8-4fb7-b436-551bbd8a6fdc.ws-eu01.gitpod.io/
-				this.socket = io("http://localhost:3000"); // Client socket to > server adress
-			
+			this.socket = io("http://localhost:3000"); // Client socket to > server adress / Gitpod change
 		},
-		// After the view renders, we want to start listening for events, best way is mounted(), so we can work with our canvas
 		mounted(){
+				var username = prompt('What\'s your username?');
 
-				this.context = this.$refs.game.getContext("2d");
+				if (username){ 
 
-				this.socket.on("position", data => {
-						this.position = data;
-						this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height); // Clear the canvas
-						this.context.fillRect(this.position.x, this.position.y, 20, 20); // Add a rectangle
-				})
-				this.socket.on('Created', data => {  
-						
-					this.events.push(data);
+					this.socket.emit('little_newbie', username);
 
-				})
-				this.socket.on('disconnect', data => {  
-						
-					this.events.push(data);
 
-				})
-				this.socket.on('playing', data => {  
-						// eslint-disable-next-line no-console
+					this.context = this.$refs.game.getContext("2d");
 
+					this.socket.on("position", data => {
+							this.position = data;
+							this.context.clearRect(0, 0, this.$refs.game.width, this.$refs.game.height); // Clear the canvas
+							this.context.fillRect(this.position.x, this.position.y, 20, 20); // Add a rectangle
+					})
+					// this.socket.on('Created', data => {  
+					// 	this.events.push(data);
+					// })
+					this.socket.on('disconnect', data => {  
+							
 						this.events.push(data);
-					
-					
+
+					})
+					this.socket.on('playing', data => {  
+							// eslint-disable-next-line no-console
+
+							this.events.push(data);
 						
-				})
-				this.socket.on('paused', data => {  
+						
+							
+					})
+					this.socket.on('paused', data => {  
+							// eslint-disable-next-line no-console
+						
+							this.events.push(data); //write to array, which will output to dom with v-for
+							//console.log(this.events);
+
+					})
+					this.socket.on('ready', data => {  
+							// eslint-disable-next-line no-console
+							this.events.push(data); //write to array, which will output to dom with v-for
+							//console.log(this.events);
+
+					})
+					this.socket.on('ended', data => {  
+							// eslint-disable-next-line no-console
+							this.events.push(data); //write to array, which will output to dom with v-for
+							//console.log(this.events);
+
+					})
+					this.socket.on('little_newbie', data => {  
 						// eslint-disable-next-line no-console
-					
 						this.events.push(data); //write to array, which will output to dom with v-for
 						//console.log(this.events);
 
-				})
-				this.socket.on('ready', data => {  
-						// eslint-disable-next-line no-console
-						this.events.push(data); //write to array, which will output to dom with v-for
-						//console.log(this.events);
-
-				})
-				this.socket.on('ended', data => {  
-						// eslint-disable-next-line no-console
-						this.events.push(data); //write to array, which will output to dom with v-for
-						//console.log(this.events);
-
-				})
-
+					})
+				
+				
+				}
 		
 				//setInterval(this.getNow, 5000);//refs are available only after mounted
 
@@ -178,6 +191,9 @@
 			playVideo() {
 				this.player.playVideo()
 			},
+			pauseVideo(){
+				this.player.pauseVideo()
+			}
 
 
 		}, //methods
@@ -271,6 +287,14 @@
 		left: 170px;
 		top: 5px;
 	}
+	.ytb-but button{
+		background-color:indianred;
+	}
+	.ytb-but {
+			position: absolute;
+		left: 52.4%;
+		bottom: 240px;
+	}
 
 	.play{
 		color: #00ff00;
@@ -288,4 +312,5 @@
 	.endView{
 		color: #ff6347
 	}
+
 	</style>
