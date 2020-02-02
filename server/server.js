@@ -26,10 +26,11 @@ Socketio.on("connection", socket => {
         console.log(socket.id + ' disconnected.')
     })
     socket.on("playing", data => {
-        console.log(socket.id + ' playing video.') // log here socket.handshake.time 
+        console.log(socket.id + ' played video.') // log here socket.handshake.time 
         //.slice to make it shorter in client
         Socketio.emit('playing', {
-            idAction: socket.id + " played the video.",
+            id: socket.id ,
+            action: "started watching.",
             timestamp: socket.handshake.time 
         })  // send to all clients
     })
@@ -37,7 +38,8 @@ Socketio.on("connection", socket => {
         console.log( socket.id + ' paused video.') // log here
 
         Socketio.emit('paused', {
-            idAction: socket.id + " paused the video.",
+            id: socket.id ,
+            action: "paused.",
             timestamp: socket.handshake.time 
         })  // send to all clients
     })

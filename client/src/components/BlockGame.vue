@@ -1,6 +1,6 @@
 	<template>
 	<div id="sockets">
-		<canvas ref="game" width="340" height="280" style="border: 1px solid black;">
+		<canvas ref="game" width="320" height="240" style="border: 1px solid black;">
 		</canvas>
 		<br>
 		<button @click="move('right')">Right</button>
@@ -8,29 +8,44 @@
 		<button @click="move('up')">Up</button>
 		<button @click="move('down')">Down</button>
 
-		<ul>Last connected: 
-				<li ref="connected"> </li>
-		</ul>
-
-		<youtube ref="youtube" id="ytb" :video-id="videoId" @ready="ready" @playing="playing" @paused="paused"></youtube>
-		
-		<div id="bar">
-    <div id="red">
-    </div>
-    <div id="yellow">
-    </div>
-    <div id="green">
-    </div>
-		</div>
+		<!-- MacOs Terminal-->
+		<div id="youtubeTerminal">
+			<div id="bar"> 
+				<span id="whatfor">Youtube Logs</span>
+				<div id="red"></div>
+				<div id="yellow"></div>
+				<div id="green"></div>
+			</div>
 			<ul class="list-container" v-chat-scroll > 
 				<li 
 						v-for="event in events" :key="event.id" 
 						ref="playingPaused"
 						
-				> -
-					<span>{{event.idAction}} </span>
+				> 
+					<span class="id">{{event.id.substring(0, 8)}} </span> 
+					<span :class="{'play': event.action === 'started watching.', 'pause': event.action === 'paused.' }"> {{event.action}}</span>  
+
+			
 					<!-- <span ref="fromNow" >{{ event.timestamp  }}</span>   Future reference, or local component-->
 					<dynamic-from-now class="timestamp" :interval="60000"></dynamic-from-now>
+				</li>
+			</ul>
+		</div>
+
+		<youtube ref="youtube" id="ytb" :video-id="videoId" @ready="ready" @playing="playing" @paused="paused"></youtube>
+		
+		
+
+
+		<div id="bar"> 
+			<span id="whatfor">Room Logs</span>
+			<div id="red"></div>
+			<div id="yellow"></div>
+			<div id="green"></div>
+		</div>
+			<ul class="list-container" style="opacity: 0.6; filter: blur(1px);">
+				<li>
+
 				</li>
 			</ul>
 	
@@ -135,10 +150,15 @@
 
 	<!-- Add "scoped" attribute to limit CSS to this component only -->
 	<style>
+	#youtubeTerminal{
+		position: absolute;
+		bottom:80px;
+		right:10px;
+	}
 	#ytb{
 		position: absolute;
-		top:0%;
-		right:0;
+		top:0;
+		right:10px;
 	}
 
 	ul.list-container  {
@@ -158,6 +178,8 @@
 		font-size:12px;
 		color: #ffffff;
 		font-weight: 400;
+		padding-left:3px;
+	float: right;
 	}
 
 	/*MacOs Terminal*/ 
@@ -172,6 +194,7 @@
     padding: auto;
     float: none;
     border-radius: 5px;
+		position: relative;
 }
 #red {
     background-color: #E94B35;
@@ -205,5 +228,20 @@
     position:relative;
     display: block;
 }
+	#whatfor{
+		position: absolute;
+    height: 15px;
+		left: 170px;
+		top: 5px;
+	}
 
+	.play{
+		color: #00ff00;
+	}
+	.pause{
+			color: #f1f227;
+	}
+	.id{
+		color: #be90d4
+	}
 	</style>
