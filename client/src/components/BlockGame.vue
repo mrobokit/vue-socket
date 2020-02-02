@@ -39,11 +39,14 @@
 					<dynamic-from-now class="timestamp" :interval="60000"></dynamic-from-now>
 				</li>
 			</ul>
+			<button id="clear" >Delete</button> <!-- @click="clearLogs"-->
 		</div>
 				
 			<div class="ytb-but"> 
 					<button @click="playVideo">Play</button>
 					<button @click="pauseVideo">Pause</button>
+					<button @click="seekTo">Seek To</button>
+					<button @click="playAll">Play All</button>
 			</div>
 
 
@@ -56,7 +59,7 @@
 
 	
 
-
+		<!-- Spare Mac Terminal
 		<div id="bar"> 
 			<span id="whatfor">Room Logs</span>
 			<div id="red"></div>
@@ -68,7 +71,7 @@
 
 				</li>
 			</ul>
-	
+		-->
 
 
 
@@ -88,14 +91,14 @@
 						socket: {},
 						context: 0,
 						position :{x: 0, y: 0},
-						videoId: 'BBJa32lCaaY',
+						videoId: 'q0hyYWKXF0Q',
 						events: [],
 						username: "",
 
 			}
 		},
 		created(){
-			this.socket = io("http://localhost:3000"); // Client socket to > server adress / Gitpod change
+			this.socket = io("http://localhost:3000/"); // http://192.168.100.3:3000/" Client socket to > server adress / Gitpod change
 		},
 		mounted(){
 				var username = prompt('What\'s your username?');
@@ -124,7 +127,7 @@
 							// eslint-disable-next-line no-console
 
 							this.events.push(data);
-						
+						//this.player.playVideo(); // Send command to play video on all clients;
 						
 							
 					})
@@ -133,13 +136,12 @@
 						
 							this.events.push(data); //write to array, which will output to dom with v-for
 							//console.log(this.events);
-
+							//this.player.pauseVideo(); // Send command to play video on all clients;
 					})
 					this.socket.on('ready', data => {  
 							// eslint-disable-next-line no-console
 							this.events.push(data); //write to array, which will output to dom with v-for
 							//console.log(this.events);
-
 					})
 					this.socket.on('ended', data => {  
 							// eslint-disable-next-line no-console
@@ -153,7 +155,12 @@
 						//console.log(this.events);
 
 					})
-				
+					
+					this.socket.on('play_all', data => {  
+					
+						this.player.playVideo();
+							this.events.push(data);
+					})
 				
 				}
 		
@@ -193,6 +200,12 @@
 			},
 			pauseVideo(){
 				this.player.pauseVideo()
+			},
+			seekTo(){
+				this.player.seekTo(5 , false)
+			},
+			playAll(){
+				this.socket.emit("play_all")
 			}
 
 
@@ -205,7 +218,7 @@
 	<style>
 	#youtubeTerminal{
 		position: absolute;
-		bottom:80px;
+		bottom:0px;
 		right:10px;
 	}
 	#ytb{
@@ -293,7 +306,10 @@
 	.ytb-but {
 			position: absolute;
 		left: 52.4%;
-		bottom: 240px;
+		bottom: 0px;
+	}
+	#clear{
+		float: right;
 	}
 
 	.play{

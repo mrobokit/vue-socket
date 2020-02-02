@@ -83,6 +83,19 @@ Socketio.on("connection", socket => {
             })  // send to all clients
 
         });
+        socket.on('play_all', data => {
+           
+            console.log('I command all players play now!');
+
+            Socketio.emit('play_all', {
+
+                action: "Get Playing guys!",
+ 
+            })  // send to all clients
+
+        });
+
+
         socket.on('move', data => {
             switch (data) {
                 case "left":
