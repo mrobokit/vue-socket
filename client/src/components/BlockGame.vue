@@ -22,8 +22,16 @@
 						ref="playingPaused"
 						
 				> 
-					<span class="id">{{event.id.substring(0, 8)}} </span> 
-					<span :class="{'play': event.action === 'started watching.', 'pause': event.action === 'paused.' }"> {{event.action}}</span>  
+					<span class="id">{{event.id.substring(0, 8)}} </span>  <!-- .substring(0, 8)-->
+					<span :class="{'play': event.action === 'started watching.', 
+												'pause': event.action === 'paused.', 
+												'': event.action == 'joined room.', 
+												'leftRoom': event.action == 'left room.',
+												'endView' : event.action == 'ended watching.',
+												
+												}"
+					> {{event.action}}
+					</span>  
 
 			
 					<!-- <span ref="fromNow" >{{ event.timestamp  }}</span>   Future reference, or local component-->
@@ -32,8 +40,14 @@
 			</ul>
 		</div>
 
-		<youtube ref="youtube" id="ytb" :video-id="videoId" @ready="ready" @playing="playing" @paused="paused"></youtube>
-		
+		<youtube ref="youtube" id="ytb" :video-id="videoId" 
+						@ready="ready" 
+						@playing="playing" 
+						@paused="paused"
+						@ended="ended"
+						@buffering="buffering"
+						@qued="qued"></youtube>
+		<button @click="playVideo">play</button>
 		
 
 
@@ -68,24 +82,21 @@
 						socket: {},
 						context: 0,
 						position :{x: 0, y: 0},
-						videoId: 'ikpsEt0bJXw',
+						videoId: 'BBJa32lCaaY',
 						events: [],
 
 			} //fara virgula dupa return
 		},
-
 		// Ready to establish a socket connection, best way is created(), before the View renders
 		created(){
 
 				//this.interval = setInterval(() => this.$forceUpdate(), 1000); //2. time magic
 				// For Gitpod, beware as it is not localhost, instead paste the link they gave eg: https://3000-ec7c0a46-d8e8-4fb7-b436-551bbd8a6fdc.ws-eu01.gitpod.io/
 				this.socket = io("http://localhost:3000"); // Client socket to > server adress
+			
 		},
-
 		// After the view renders, we want to start listening for events, best way is mounted(), so we can work with our canvas
 		mounted(){
-
-				
 
 				this.context = this.$refs.game.getContext("2d");
 
@@ -95,15 +106,20 @@
 						this.context.fillRect(this.position.x, this.position.y, 20, 20); // Add a rectangle
 				})
 				this.socket.on('Created', data => {  
-						// eslint-disable-next-line no-console
-						console.log(data);
+						
+					this.events.push(data);
+
+				})
+				this.socket.on('disconnect', data => {  
+						
+					this.events.push(data);
 
 				})
 				this.socket.on('playing', data => {  
 						// eslint-disable-next-line no-console
 
 						this.events.push(data);
-						
+					
 					
 						
 				})
@@ -114,14 +130,28 @@
 						//console.log(this.events);
 
 				})
+				this.socket.on('ready', data => {  
+						// eslint-disable-next-line no-console
+						this.events.push(data); //write to array, which will output to dom with v-for
+						//console.log(this.events);
+
+				})
+				this.socket.on('ended', data => {  
+						// eslint-disable-next-line no-console
+						this.events.push(data); //write to array, which will output to dom with v-for
+						//console.log(this.events);
+
+				})
 
 		
 				//setInterval(this.getNow, 5000);//refs are available only after mounted
 
 		},
-		computed:{
-
-		},
+  	computed: {
+    	player() {
+				return this.$refs.youtube.player
+			}
+    },
 		methods: {
 			// "Move in this direction and let the server determine how far it moved"
 			move(direction){ 
@@ -130,16 +160,23 @@
 			ready (event) {
 					this.player = event.target;
 					console.log('Player is ready.')
+					this.socket.emit("ready");
+			},
+			ended (){
+				// On video end
+				console.log('Yay. You`ve stayed until the end . Video ended!')
+				this.socket.emit("ended");//1. Emit from client to server, from server back, and client show again	
 			},
 			playing () {
 				console.log('\o/ we are watching!!!')
-				this.socket.emit("playing");//1. Emit from client to server, from server back, and client show again
-				
+				this.socket.emit("playing");//1. Emit from client to server, from server back, and client show again		
 			},
 			paused () {
 				console.log('Video paused')
 				this.socket.emit("paused");
-				
+			},
+			playVideo() {
+				this.player.playVideo()
 			},
 
 
@@ -169,7 +206,7 @@
 		margin:0;
 		overflow-y: auto;
 		background-color: #33485E;
-		color:#00ff7f;
+		color:#ffffff;
 		padding: 12px;
 		border-radius: 0px 0px 8px 8px;
 	}
@@ -241,7 +278,14 @@
 	.pause{
 			color: #f1f227;
 	}
-	.id{
-		color: #be90d4
+	.id {
+		color: #be90d4;
+	}
+	.leftRoom{
+		text-decoration: line-through;
+
+	}
+	.endView{
+		color: #ff6347
 	}
 	</style>
