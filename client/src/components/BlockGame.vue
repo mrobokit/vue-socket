@@ -14,15 +14,23 @@
 
 		<youtube ref="youtube" id="ytb" :video-id="videoId" @ready="ready" @playing="playing" @paused="paused"></youtube>
 		
-		
+		<div id="bar">
+    <div id="red">
+    </div>
+    <div id="yellow">
+    </div>
+    <div id="green">
+    </div>
+		</div>
 			<ul class="list-container" v-chat-scroll > 
 				<li 
 						v-for="event in events" :key="event.id" 
 						ref="playingPaused"
 						
-				> 
+				> -
 					<span>{{event.idAction}} </span>
-					<span ref="timestamp" class="timestamp">{{event.timestamp | fromNow }}</span>  <!--3 time magic + 4. script in html = done!-->
+					<!-- <span ref="fromNow" >{{ event.timestamp  }}</span>   Future reference, or local component-->
+					<dynamic-from-now class="timestamp" :interval="60000"></dynamic-from-now>
 				</li>
 			</ul>
 	
@@ -36,9 +44,8 @@
 	<script>
 	/* eslint-disable */
 	import io from 'socket.io-client'; 
-	//import moment from 'moment'
-	
-	//will import vue moment
+
+
 	export default {
 		name: 'BlockGame',
 		data(){
@@ -46,28 +53,25 @@
 						socket: {},
 						context: 0,
 						position :{x: 0, y: 0},
-						videoId: '6twHWEstx2Q',
+						videoId: 'ikpsEt0bJXw',
 						events: [],
-						interval: null //1. time magic
 
 			} //fara virgula dupa return
 		},
-		filters: {
-				fromNow(date) {
-					return moment(date).fromNow();
-				}
-		},	
+
 		// Ready to establish a socket connection, best way is created(), before the View renders
 		created(){
 
-				this.interval = setInterval(() => this.$forceUpdate(), 1000); //2. time magic
-			
+				//this.interval = setInterval(() => this.$forceUpdate(), 1000); //2. time magic
 				// For Gitpod, beware as it is not localhost, instead paste the link they gave eg: https://3000-ec7c0a46-d8e8-4fb7-b436-551bbd8a6fdc.ws-eu01.gitpod.io/
 				this.socket = io("http://localhost:3000"); // Client socket to > server adress
 		},
+
 		// After the view renders, we want to start listening for events, best way is mounted(), so we can work with our canvas
 		mounted(){
+
 				
+
 				this.context = this.$refs.game.getContext("2d");
 
 				this.socket.on("position", data => {
@@ -82,10 +86,10 @@
 				})
 				this.socket.on('playing', data => {  
 						// eslint-disable-next-line no-console
-			
+
 						this.events.push(data);
-	
-						//console.log(this.events);
+						
+					
 						
 				})
 				this.socket.on('paused', data => {  
@@ -96,9 +100,11 @@
 
 				})
 
+		
+				//setInterval(this.getNow, 5000);//refs are available only after mounted
+
 		},
-		beforeUpdated() {
-	
+		computed:{
 
 		},
 		methods: {
@@ -111,20 +117,19 @@
 					console.log('Player is ready.')
 			},
 			playing () {
-			// The player is playing a video.
 				console.log('\o/ we are watching!!!')
 				this.socket.emit("playing");//1. Emit from client to server, from server back, and client show again
+				
 			},
 			paused () {
 				console.log('Video paused')
 				this.socket.emit("paused");
-				//this.socket.emit("playing", event);//1. Emit from client to server, from server back, and client show again
+				
 			},
 
+
 		}, //methods
-			beforeDestroy() {
-				clearInterval(this.interval);
-			},
+
 	}
 	</script>
 
@@ -137,16 +142,68 @@
 	}
 
 	ul.list-container  {
-  list-style-type: none;
-	font-size: 14px;
+  	list-style-type: none;
+		font-size: 14px;
 		height: 150px;
 		width:400px;
+		margin:0;
 		overflow-y: auto;
-		background: lightseagreen;
-		color: rgb(61, 24, 24);
+		background-color: #33485E;
+		color:#00ff7f;
+		padding: 12px;
+		border-radius: 0px 0px 8px 8px;
 	}
 	.timestamp{
-		opacity: 0.7;
+		opacity: 0.75;
 		font-size:12px;
+		color: #ffffff;
+		font-weight: 400;
 	}
+
+	/*MacOs Terminal*/ 
+
+#bar {
+    text-align: center;
+    width: 424px;
+    height: 25px;
+    background-color: #DAD9D9;
+    margin: 0 ;
+    font-family: monospace;
+    padding: auto;
+    float: none;
+    border-radius: 5px;
+}
+#red {
+    background-color: #E94B35;
+    border-radius: 100%;
+    width: 15px;
+    height: 15px;
+    margin: 0 auto;
+    left: -200px;
+    bottom: -20%;
+    position:relative;
+}
+#yellow {
+    background-color: #f0f000;
+    border-radius: 100%;
+    width: 15px;
+    height: 15px;
+    margin: 0 auto;
+    left: -180px;
+    bottom: 40%;
+    position:relative;
+    display: block;
+}
+#green {
+    background-color: #1AAF5C;
+    border-radius: 100%;
+    width: 15px;
+    height: 15px;
+    margin: 0 auto;
+    left: -160px;
+    bottom: 99%;
+    position:relative;
+    display: block;
+}
+
 	</style>
